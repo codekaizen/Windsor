@@ -1,4 +1,4 @@
-﻿// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+﻿// Copyright 2004-2012 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -205,7 +205,7 @@ namespace Castle.MicroKernel.Registration
 				path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, path);
 			}
 #endif
-			return Path.GetFullPath(path).ToUpper(CultureInfo.InvariantCulture);
+			return Path.GetFullPath(path);
 		}
 
 		private static bool IsTokenEqual(byte[] actualToken, byte[] expectedToken)

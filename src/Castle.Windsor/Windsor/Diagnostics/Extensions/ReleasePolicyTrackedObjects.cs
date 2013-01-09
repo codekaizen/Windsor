@@ -1,4 +1,4 @@
-﻿// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+﻿// Copyright 2004-2012 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ namespace Castle.Windsor.Diagnostics.Extensions
 				var view = ComponentDebuggerView.BuildFor(handler);
 				var item = new DebuggerViewItem(handler.GetComponentName(),
 				                                "Count = " + objects.Length,
-				                                new ReleasePolicyTrackedObjectsDebuggerViewItem(view, objects));
+				                                new MasterDetailsDebuggerViewItem(view, view.Description, "Component", objects));
 				items.Add(item);
 			}
 			items.Sort((f, s) => f.Name.CompareTo(s.Name));

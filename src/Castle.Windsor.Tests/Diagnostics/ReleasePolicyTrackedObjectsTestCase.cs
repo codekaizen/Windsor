@@ -1,4 +1,4 @@
-﻿// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+﻿// Copyright 2004-2012 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -57,8 +57,8 @@ namespace CastleTests.Diagnostics
 			var objects = GetTrackedObjects();
 			var values = (DebuggerViewItem[])objects.Value;
 			Assert.AreEqual(1, values.Length);
-			var viewItem = (ReleasePolicyTrackedObjectsDebuggerViewItem)values.Single().Value;
-			Assert.AreEqual(2, viewItem.Instances.Length);
+			var viewItem = (MasterDetailsDebuggerViewItem)values.Single().Value;
+			Assert.AreEqual(2, viewItem.Details.Length);
 		}
 
 		[Test]
@@ -73,7 +73,7 @@ namespace CastleTests.Diagnostics
 			var objects = GetTrackedObjects();
 			var values = (DebuggerViewItem[])objects.Value;
 			Assert.AreEqual(3, values.Length);
-			var instances = values.SelectMany(v => ((ReleasePolicyTrackedObjectsDebuggerViewItem)v.Value).Instances).ToArray();
+			var instances = values.SelectMany(v => ((MasterDetailsDebuggerViewItem)v.Value).Details).ToArray();
 			Assert.AreEqual(4, instances.Length);
 		}
 
@@ -88,14 +88,16 @@ namespace CastleTests.Diagnostics
 			var objects = GetTrackedObjects();
 			var values = (DebuggerViewItem[])objects.Value;
 			Assert.AreEqual(1, values.Length);
-			var viewItem = (ReleasePolicyTrackedObjectsDebuggerViewItem)values.Single().Value;
-			Assert.AreEqual(1, viewItem.Instances.Length);
+			var viewItem = (MasterDetailsDebuggerViewItem)values.Single().Value;
+			Assert.AreEqual(1, viewItem.Details.Length);
 		}
 
 		[Test]
 		public void NoTrackingReleasePolicy_does_not_appear()
 		{
+#pragma warning disable 612,618
 			Kernel.ReleasePolicy = new NoTrackingReleasePolicy();
+#pragma warning restore 612,618
 			Register<DisposableFoo>();
 
 			Container.Resolve<DisposableFoo>();

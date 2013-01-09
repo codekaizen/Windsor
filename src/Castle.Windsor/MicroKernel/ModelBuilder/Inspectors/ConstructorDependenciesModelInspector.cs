@@ -67,7 +67,7 @@ namespace Castle.MicroKernel.ModelBuilder.Inspectors
         private List<ConstructorInfo> GetConstructors(ComponentModel model, Type targetType)
         {
             var constructors = targetType.GetConstructors(BindingFlags.Public | BindingFlags.Instance)
-                                         .Where(IsValidConstructor)
+                                         .Where(IsVisibleToContainer)
                                          .ToList();
             return constructors;
         }
@@ -84,14 +84,9 @@ namespace Castle.MicroKernel.ModelBuilder.Inspectors
 			return new ConstructorDependencyModel(parameter);
 		}
 
-		private static bool HasDoNotSelectAttribute(ConstructorInfo constructor)
+		protected virtual bool IsVisibleToContainer(ConstructorInfo constructor)
 		{
-			return constructor.HasAttribute<DoNotSelectAttribute>();
+			return constructor.HasAttribute<DoNotSelectAttribute>() == false;
 		}
-
-        private static bool IsValidConstructor(ConstructorInfo constructor)
-        {
-            return !HasDoNotSelectAttribute(constructor);
-        }
 	}
 }

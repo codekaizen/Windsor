@@ -300,7 +300,9 @@
     <Compile Include="Bugs\IoC-267.cs" />
     <Compile Include="Bugs\IoC-334.cs" />
     <Compile Include="ByRefDependenciesTestCase.cs" />
+    <Compile Include="ClassComponents\Common2Impl.cs" />
     <Compile Include="ClassComponents\CommonServiceUser3.cs" />
+    <Compile Include="ClassComponents\CustomerValidatorAndRepository.cs" />
     <Compile Include="ClassComponents\GenericDummyComponentAImpl.cs" />
     <Compile Include="ClassComponents\GenericDummyComponentImpl.cs" />
     <Compile Include="ClassComponents\GenericDummyComponentImpl2.cs" />
@@ -308,8 +310,14 @@
     <Compile Include="ClassComponents\GenericExtendedImpl.cs" />
     <Compile Include="ClassComponents\GenericImplA.cs" />
     <Compile Include="ClassComponents\GenericWithTDependency.cs" />
+    <Compile Include="ClassComponents\HasObjectPropertyAndTypedCtorParameterDifferentName.cs" />
+    <Compile Include="ClassComponents\HasObjectPropertyAndTypedCtorParameterWithSameName.cs" />
+    <Compile Include="ClassComponents\HasPropertyAndCtorParameterSameTypeDifferentName.cs" />
     <Compile Include="ClassComponents\IGenericExtended.cs" />
     <Compile Include="ClassComponents\PropertySetterThrows.cs" />
+    <Compile Include="ClassComponents\ThreeEmptyServiceDependenciesPropertyAndManyCtors.cs" />
+    <Compile Include="ClassComponents\TwoEmptyServiceDependenciesConstructor.cs" />
+    <Compile Include="ClassComponents\TwoEmptyServiceDependenciesProperty.cs" />
     <Compile Include="ClassComponents\UseGenericExtended1.cs" />
     <Compile Include="ClassComponents\UseGenericExtended2.cs" />
     <Compile Include="ClassComponents\UsesArrayOfGeneric.cs" />
@@ -413,6 +421,7 @@
     <Compile Include="Components\ISimpleMixIn.cs" />
     <Compile Include="Components\ISimpleService2.cs" />
     <Compile Include="Components\ItemService.cs" />
+    <Compile Include="Components\IUse.cs" />
     <Compile Include="Components\IView.cs" />
     <Compile Include="Components\JohnChild.cs" />
     <Compile Include="Components\JohnGrandparent.cs" />
@@ -435,6 +444,8 @@
     <Compile Include="Components\UnresolvalbeDependency.cs" />
     <Compile Include="Components\UnresolvalbeDependencyWithAdditionalServiceConstructor.cs" />
     <Compile Include="Components\UnresolvalbeDependencyWithPrimitiveConstructor.cs" />
+    <Compile Include="Components\Use.cs" />
+    <Compile Include="Components\UseChain.cs" />
     <Compile Include="Components\UsesLazy.cs" />
     <Compile Include="Components\UsesUri.cs" />
     <Compile Include="CompositePatternTestCase.cs" />
@@ -446,7 +457,8 @@
     <Compile Include="ContainerExtensions\GoodDependencyResolver.cs" />
     <Compile Include="DependencyCyclesTestCase.cs" />
     <Compile Include="Diagnostics\AllServicesDiagnosticTestCase.cs" />
-    <Compile Include="ExceptionsTestCase.cs" />
+    <Compile Include="Diagnostics\DuplicatedDependenciesDiagnosticTestCase.cs" />
+    <Compile Include="HelpfulExceptionsOnResolveTestCase.cs" />
     <Compile Include="Facilities\Startable\StartableAndExceptionThrowingInstallersTestCase.cs" />
     <Compile Include="Facilities\TypedFactory\Delegates\HasFuncProperty.cs" />
     <Compile Include="Facilities\TypedFactory\TypedFactoryDelegatesInvalidScenariosTestCase.cs" />
@@ -460,6 +472,8 @@
     <Compile Include="Generics\GenericA.cs" />
     <Compile Include="Generics\GenericB.cs" />
     <Compile Include="IgnoreSelectTestCase.cs" />
+    <Compile Include="InterceptorLifecycleTestCase.cs" />
+    <Compile Include="Interceptors\GenericInterceptor.cs" />
     <Compile Include="Interceptors\InterceptorAttributeTestCase.cs" />
     <Compile Include="CreatingContainerTestCase.cs" />
     <Compile Include="Diagnostics\UsingContainerAsServiceLocatorDiagnosticTestCase.cs" />
@@ -614,6 +628,7 @@
     </Compile>
     <Compile Include="PropertyDependenciesTestCase.cs" />
     <Compile Include="Proxies\InterceptorDependenciesTestCase.cs" />
+    <Compile Include="Proxies\MixinDependencyTestCase.cs" />
     <Compile Include="ProxyInfrastructure\OnBehalfAwareInterceptorSelector.cs" />
     <Compile Include="ProxyInfrastructure\OnBehalfAwareProxyGenerationHook.cs" />
     <Compile Include="RegistrationWithAttributeAndXmlTestCase.cs" />
@@ -727,6 +742,7 @@
     <Compile Include="Registration\ServiceOverridesTestCase.cs" />
     <Compile Include="Registration\TypesTestCase.cs" />
     <Compile Include="Registration\WithServiceTestCase.cs" />
+    <Compile Include="RelatedTestCaseAttribute.cs" />
     <Compile Include="ResolveScopesTestCase.cs" />
     <Compile Include="ServiceOverridesStackOverflowTestCase.cs" />
     <Compile Include="SpecializedResolvers\CollectionResolverTestCase.cs" />
@@ -995,7 +1011,6 @@
     <Compile Include="Bugs\IoC-115.cs" />
     <Compile Include="Bugs\IoC-138.cs" />
     <Compile Include="Bugs\IoC-78\IoC-78.cs" />
-    <Compile Include="Activators\ConstructorTestCase.cs" />
     <Compile Include="Bugs\IoC_169\IoC_169.cs" />
     <Compile Include="ChildContainerSupportTestCase.cs">
       <SubType>Code</SubType>

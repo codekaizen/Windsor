@@ -67,8 +67,7 @@ namespace Castle.MicroKernel.Handlers
 		public override bool ReleaseCore(Burden burden)
 		{
 			var genericType = ProxyUtil.GetUnproxiedType(burden.Instance);
-
-			var handler = GetSubHandler(CreationContext.CreateEmpty(), genericType);
+			var handler = type2SubHandler.GetOrThrow(genericType);
 
 			return handler.Release(burden);
 		}
@@ -109,13 +108,13 @@ namespace Castle.MicroKernel.Handlers
 			return ComponentModel.Services.Any(s => SupportsAssignable(service, s, serviceArguments));
 		}
 
-		protected virtual Type[] AdaptServices(CreationContext context, Type closedImplementationType)
+		protected virtual Type[] AdaptServices(Type closedImplementationType, Type requestedType)
 		{
 			var openServices = ComponentModel.Services.ToArray();
-			if (openServices.Length == 1 && openServices[0] == context.RequestedType.GetGenericTypeDefinition())
+			if (openServices.Length == 1 && openServices[0] == requestedType.GetGenericTypeDefinition())
 			{
 				// shortcut for the most common case
-				return new[] { context.RequestedType };
+				return new[] { requestedType };
 			}
 			var closedServices = new List<Type>(openServices.Length);
 			var index = AdaptClassServices(closedImplementationType, closedServices, openServices);
@@ -127,17 +126,17 @@ namespace Castle.MicroKernel.Handlers
 			if (closedServices.Count == 0)
 			{
 				// we obviously have either a bug or an uncovered case. I suppose the best we can do at this point is to fallback to the old behaviour
-				return new[] { context.RequestedType };
+				return new[] { requestedType };
 			}
 			return closedServices.ToArray();
 		}
 
-		protected virtual IHandler BuildSubHandler(CreationContext context, Type closedImplementationType)
+		protected virtual IHandler BuildSubHandler(Type closedImplementationType, Type requestedType)
 		{
 			// TODO: we should probably match the requested type to existing services and close them over its generic arguments
 			var newModel = Kernel.ComponentModelBuilder.BuildModel(
 				ComponentModel.ComponentName,
-				AdaptServices(context, closedImplementationType),
+				AdaptServices(closedImplementationType, requestedType),
 				closedImplementationType,
 				GetExtendedProperties());
 			CloneParentProperties(newModel);
@@ -147,9 +146,9 @@ namespace Castle.MicroKernel.Handlers
 			return Kernel.AddCustomComponent(newModel, isMetaHandler: true);
 		}
 
-		protected IHandler GetSubHandler(CreationContext context, Type genericType)
+		protected IHandler GetSubHandler(Type genericType, Type requestedType)
 		{
-			return type2SubHandler.GetOrAdd(genericType, t => BuildSubHandler(context, t));
+			return type2SubHandler.GetOrAdd(genericType, t => BuildSubHandler(t, requestedType));
 		}
 
 		protected override void InitDependencies()
@@ -158,6 +157,11 @@ namespace Castle.MicroKernel.Handlers
 			var activator = Kernel.CreateComponentActivator(ComponentModel) as IDependencyAwareActivator;
 			if (activator != null && activator.CanProvideRequiredDependencies(ComponentModel))
 			{
+				foreach (var dependency in ComponentModel.Dependencies)
+				{
+					dependency.Init(ComponentModel.ParametersInternal);
+				}
+
 				return;
 			}
 
@@ -173,7 +177,7 @@ namespace Castle.MicroKernel.Handlers
 				return null;
 			}
 
-			var handler = GetSubHandler(context, implType);
+			var handler = GetSubHandler(implType, context.RequestedType);
 			// so the generic version wouldn't be considered as well
 			using (context.EnterResolutionContext(this, false, false))
 			{
@@ -214,23 +218,25 @@ namespace Castle.MicroKernel.Handlers
 		}
 
 		///<summary>
-		///	Clone some of the parent componentmodel properties to the generic subhandler.
+		///  Clone some of the parent componentmodel properties to the generic subhandler.
 		///</summary>
 		///<remarks>
-		///	The following properties are copied: <list type="bullet">
-		///		                                     <item>
-		///			                                     <description>The
-		///				                                     <see cref="LifestyleType" />
-		///			                                     </description>
-		///		                                     </item>
-		///		                                     <item>
-		///			                                     <description>The
-		///				                                     <see cref="ComponentModel.Interceptors" />
-		///			                                     </description>
-		///		                                     </item>
-		///	                                     </list>
+		///  The following properties are copied: <list type = "bullet">
+		///                                         <item>
+		///                                           <description>
+		///                                             The
+		///                                             <see cref = "LifestyleType" />
+		///                                           </description>
+		///                                         </item>
+		///                                         <item>
+		///                                           <description>
+		///                                             The
+		///                                             <see cref = "ComponentModel.Interceptors" />
+		///                                           </description>
+		///                                         </item>
+		///                                       </list>
 		///</remarks>
-		///<param name="newModel"> the subhandler </param>
+		///<param name = "newModel"> the subhandler </param>
 		private void CloneParentProperties(ComponentModel newModel)
 		{
 			// Inherits from LifeStyle's context.
@@ -264,10 +270,13 @@ namespace Castle.MicroKernel.Handlers
 
 		private Type GetClosedImplementationType(CreationContext context, bool instanceRequired)
 		{
+			if (ComponentModel.Implementation == typeof(LateBoundComponent))
+			{
+				return context.RequestedType;
+			}
 			var genericArguments = GetGenericArguments(context);
 			try
 			{
-				// TODO: what if ComponentModel.Implementation is a LateBoundComponent?
 				return ComponentModel.Implementation.MakeGenericType(genericArguments);
 			}
 			catch (ArgumentNullException)

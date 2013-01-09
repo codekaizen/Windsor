@@ -1,4 +1,4 @@
-﻿// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+﻿// Copyright 2004-2012 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ namespace Castle.Windsor.Diagnostics.Extensions
 
 	public class PotentialLifestyleMismatches : AbstractContainerDebuggerExtension
 	{
-		private const string name = "Potential Lifestyle Mismatches";
+		private const string name = "Potential lifestyle mismatches";
 		private IPotentialLifestyleMismatchesDiagnostic diagnostic;
 
 		public override IEnumerable<DebuggerViewItem> Attach()
@@ -51,12 +51,6 @@ namespace Castle.Windsor.Diagnostics.Extensions
 		{
 			diagnostic = new PotentialLifestyleMismatchesDiagnostic(kernel);
 			diagnosticsHost.AddDiagnostic(diagnostic);
-		}
-
-		private MismatchedDependencyDebuggerViewItem GetItem(IHandler[] handlers)
-		{
-			var message = GetMismatchMessage(handlers);
-			return new MismatchedDependencyDebuggerViewItem(message, handlers);
 		}
 
 		private string GetKey(IHandler root)
@@ -102,12 +96,12 @@ namespace Castle.Windsor.Diagnostics.Extensions
 			return componentModel.ToString();
 		}
 
-		private DebuggerViewItem MismatchedComponentView(IHandler[] handlers)
+		private object MismatchedComponentView(IHandler[] handlers)
 		{
-			var item = GetItem(handlers);
-			var key = GetKey(handlers.Last());
-			var name = GetName(handlers, handlers.First());
-			return new DebuggerViewItem(name, key, item);
+			return new DebuggerViewItemWithDetails(GetName(handlers, handlers.First()),
+			                                       GetKey(handlers.Last()),
+			                                       GetMismatchMessage(handlers),
+			                                       Array.ConvertAll(handlers, h => ComponentDebuggerView.BuildFor(h)));
 		}
 
 		public static string Name

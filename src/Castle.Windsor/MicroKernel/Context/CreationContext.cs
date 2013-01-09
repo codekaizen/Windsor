@@ -1,4 +1,4 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2012 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -62,10 +62,9 @@ namespace Castle.MicroKernel.Context
 		/// <summary>
 		///   Initializes a new instance of the <see cref = "CreationContext" /> class.
 		/// </summary>
-		/// <param name = "requestedType">The type to extract generic arguments.</param>
-		/// <param name = "parentContext">The parent context.</param>
-		/// <param name = "propagateInlineDependencies">When set to <c>true</c> will clone <paramref name = "parentContext" /> <see
-		///    cref = "AdditionalArguments" />.</param>
+		/// <param name = "requestedType"> The type to extract generic arguments. </param>
+		/// <param name = "parentContext"> The parent context. </param>
+		/// <param name = "propagateInlineDependencies"> When set to <c>true</c> will clone <paramref name = "parentContext" /> <see cref = "AdditionalArguments" /> . </param>
 		public CreationContext(Type requestedType, CreationContext parentContext, bool propagateInlineDependencies)
 			: this(parentContext.Handler, parentContext.ReleasePolicy, requestedType, null, null, parentContext)
 		{
@@ -88,19 +87,19 @@ namespace Castle.MicroKernel.Context
 		/// <summary>
 		///   Initializes a new instance of the <see cref = "CreationContext" /> class.
 		/// </summary>
-		/// <param name = "handler">The handler.</param>
-		/// <param name = "releasePolicy">The release policy.</param>
-		/// <param name = "requestedType">The type to extract generic arguments.</param>
-		/// <param name = "additionalArguments">The additional arguments.</param>
-		/// <param name = "converter">The conversion manager.</param>
-		/// <param name = "parent">Parent context</param>
+		/// <param name = "handler"> The handler. </param>
+		/// <param name = "releasePolicy"> The release policy. </param>
+		/// <param name = "requestedType"> The type to extract generic arguments. </param>
+		/// <param name = "additionalArguments"> The additional arguments. </param>
+		/// <param name = "converter"> The conversion manager. </param>
+		/// <param name = "parent"> Parent context </param>
 		public CreationContext(IHandler handler, IReleasePolicy releasePolicy, Type requestedType,
 		                       IDictionary additionalArguments, ITypeConverter converter,
 		                       CreationContext parent)
 		{
 			this.requestedType = requestedType;
 			this.handler = handler;
-			this.ReleasePolicy = releasePolicy;
+			ReleasePolicy = releasePolicy;
 			this.additionalArguments = EnsureAdditionalArgumentsWriteable(additionalArguments);
 			this.converter = converter;
 
@@ -119,7 +118,9 @@ namespace Castle.MicroKernel.Context
 		/// </summary>
 		private CreationContext()
 		{
+#pragma warning disable 612,618
 			ReleasePolicy = new NoTrackingReleasePolicy();
+#pragma warning restore 612,618
 			handlerStack = new Stack<IHandler>(4);
 			resolutionStack = new Stack<ResolutionContext>(4);
 		}
@@ -253,8 +254,8 @@ namespace Castle.MicroKernel.Context
 		/// <summary>
 		///   Method used by handlers to test whether they are being resolved in the context.
 		/// </summary>
-		/// <param name = "handler"></param>
-		/// <returns></returns>
+		/// <param name = "handler"> </param>
+		/// <returns> </returns>
 		/// <remarks>
 		///   This method is provided as part of double dispatch mechanism for use by handlers.
 		///   Outside of handlers, call <see cref = "IHandler.IsBeingResolvedInContext" /> instead.
@@ -447,11 +448,11 @@ namespace Castle.MicroKernel.Context
 		public class ResolutionContext : IDisposable
 		{
 			private readonly CreationContext context;
-
 			private readonly IHandler handler;
 			private readonly bool requiresDecommission;
 			private readonly bool trackContext;
 			private Burden burden;
+			private IDictionary extendedProperties;
 
 			public ResolutionContext(CreationContext context, IHandler handler, bool requiresDecommission, bool trackContext)
 			{
@@ -487,6 +488,30 @@ namespace Castle.MicroKernel.Context
 				// this is currently employed by pooled lifestyle
 				burden = new Burden(handler, requiresDecommission, trackedExternally);
 				return burden;
+			}
+
+			public object GetContextualProperty(object key)
+			{
+				if (extendedProperties == null)
+				{
+					return null;
+				}
+
+				var value = extendedProperties[key];
+				return value;
+			}
+
+			public void SetContextualProperty(object key, object value)
+			{
+				if (key == null)
+				{
+					throw new ArgumentNullException("key");
+				}
+				if (extendedProperties == null)
+				{
+					extendedProperties = new Arguments();
+				}
+				extendedProperties[key] = value;
 			}
 
 			public void Dispose()

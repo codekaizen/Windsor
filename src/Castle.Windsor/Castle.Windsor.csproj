@@ -320,6 +320,7 @@
     <Compile Include="Core\Internal\ComponentModelExtensions.cs" />
     <Compile Include="Core\Internal\Constants.cs" />
     <Compile Include="Core\Internal\ExceptionHelper.cs" />
+    <Compile Include="Core\Internal\HelpfulExceptionsUtil.cs" />
     <Compile Include="Core\Internal\LifestyleExtensions.cs" />
     <Compile Include="Core\Internal\Must.cs" />
     <Compile Include="Core\Internal\SegmentedList.cs" />
@@ -353,6 +354,7 @@
     <Compile Include="Core\PropertiesInspectionBehavior.cs" />
     <Compile Include="Core\PropertyDependencyFilter.cs" />
     <Compile Include="Core\StandardConstructorFilters.cs" />
+    <Compile Include="Core\PropertyDependencyModel.cs" />
     <Compile Include="Core\StandardPropertyFilters.cs" />
     <Compile Include="Core\PropertyFilter.cs" />
     <Compile Include="Core\ScopedAttribute.cs" />
@@ -888,17 +890,23 @@
     </Compile>
     <Compile Include="Windsor\Diagnostics\AllComponentsDiagnostic.cs" />
     <Compile Include="Windsor\Diagnostics\AllServicesDiagnostic.cs" />
+    <Compile Include="Windsor\Diagnostics\ComponentDebuggerExtension.cs" />
+    <Compile Include="Windsor\Diagnostics\DebuggerViews\DebuggerViewItemWithDetails.cs" />
     <Compile Include="Windsor\Diagnostics\DefaultDiagnosticsSubSystem.NonSilverlight.cs" />
-    <Compile Include="Windsor\Diagnostics\DebuggerViews\ReleasePolicyTrackedObjectsDebuggerViewItem.cs" />
+    <Compile Include="Windsor\Diagnostics\DebuggerViews\MasterDetailsDebuggerViewItem.cs" />
+    <Compile Include="Windsor\Diagnostics\DependencyDuplicate.cs" />
+    <Compile Include="Windsor\Diagnostics\DependencyDuplicationReason.cs" />
+    <Compile Include="Windsor\Diagnostics\DuplicatedDependenciesDiagnostic.cs" />
+    <Compile Include="Windsor\Diagnostics\Extensions\DuplicatedDependenciesDebuggerExtension.cs" />
     <Compile Include="Windsor\Diagnostics\Extensions\UsingContainerAsServiceLocator.cs" />
     <Compile Include="Windsor\Diagnostics\Extensions\AllServices.cs" />
     <Compile Include="Windsor\Diagnostics\IAllServicesDiagnostic.cs" />
+    <Compile Include="Windsor\Diagnostics\IDuplicatedDependenciesDiagnostic.cs" />
     <Compile Include="Windsor\Diagnostics\NullPerformanceCounter.cs" />
     <Compile Include="Windsor\Diagnostics\TrackedComponentsPerformanceCounterWrapper.cs" />
     <Compile Include="Windsor\Diagnostics\UsingContainerAsServiceLocatorDiagnostic.cs" />
     <Compile Include="Windsor\Diagnostics\Helpers\DescriptionUtil.cs" />
     <Compile Include="Windsor\Diagnostics\Extensions\ReleasePolicyTrackedObjects.cs" />
-    <Compile Include="Windsor\Diagnostics\DebuggerViews\ComponentStatusDebuggerViewItem.cs" />
     <Compile Include="Windsor\Diagnostics\Helpers\DefaultComponentViewBuilder.cs" />
     <Compile Include="Windsor\Diagnostics\Extensions\AbstractContainerDebuggerExtension.cs" />
     <Compile Include="Windsor\Diagnostics\Extensions\AllComponents.cs" />
@@ -926,7 +934,6 @@
     <Compile Include="Windsor\Diagnostics\IUsingContainerAsServiceLocatorDiagnostic.cs" />
     <Compile Include="Windsor\Diagnostics\KernelDebuggerProxy.cs" />
     <Compile Include="Windsor\Diagnostics\Extensions\PotentiallyMisconfiguredComponents.cs" />
-    <Compile Include="Windsor\Diagnostics\DebuggerViews\MismatchedDependencyDebuggerViewItem.cs" />
     <Compile Include="Windsor\Diagnostics\PerformanceMetricsFactory.cs" />
     <Compile Include="Windsor\Diagnostics\PotentialLifestyleMismatchesDiagnostic.cs" />
     <Compile Include="Windsor\Diagnostics\PotentiallyMisconfiguredComponentsDiagnostic.cs" />

@@ -1,4 +1,4 @@
-// Copyright 2004-2011 Castle Project - http://www.castleproject.org/
+// Copyright 2004-2012 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,30 +17,38 @@ namespace Castle.Windsor.Diagnostics.DebuggerViews
 #if !SILVERLIGHT
 	using System.Diagnostics;
 
-	public class ReleasePolicyTrackedObjectsDebuggerViewItem
+	[DebuggerDisplay("{description,nq}", Name = "{name,nq}")]
+	public class DebuggerViewItemWithDetails
 	{
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private readonly ComponentDebuggerView component;
+		private readonly object description;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private readonly object[] instances;
+		private readonly string name;
 
-		public ReleasePolicyTrackedObjectsDebuggerViewItem(ComponentDebuggerView component, object[] instances)
+		public DebuggerViewItemWithDetails(string name, string description, string details,params object[] items)
 		{
-			this.component = component;
-			this.instances = instances;
+			this.name = name;
+			this.description = description;
+			Details = details;
+			Items = items;
 		}
 
-		[DebuggerDisplay("{component.Description,nq}")]
-		public ComponentDebuggerView Component
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		public object Description
 		{
-			get { return component; }
+			get { return description; }
 		}
+
+		public string Details { get; private set; }
 
 		[DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-		public object[] Instances
+		public object[] Items { get; set; }
+
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		public string Name
 		{
-			get { return instances; }
+			get { return name; }
 		}
 	}
 #endif
