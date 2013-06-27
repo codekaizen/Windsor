@@ -34,10 +34,10 @@ namespace Castle.MicroKernel.Releasers
 #if !SILVERLIGHT
 		private static int instanceId;
 #endif
-
-		private readonly Dictionary<object, Burden> instance2Burden =
-			new Dictionary<object, Burden>(ReferenceEqualityComparer<object>.Instance);
-
+        private readonly Dictionary<InstanceEntry, Burden> instance2Burden =
+            new Dictionary<InstanceEntry, Burden>();
+        private Int64 currentTimestamp;
+        
 		private readonly Lock @lock = Lock.Create();
 		private readonly ITrackedComponentsPerformanceCounter perfCounter;
 		private ITrackedComponentsDiagnostic trackedComponentsDiagnostic;
@@ -98,7 +98,7 @@ namespace Castle.MicroKernel.Releasers
 
 		public void Dispose()
 		{
-			KeyValuePair<object, Burden>[] burdens;
+			List<KeyValuePair<InstanceEntry, Burden>> burdens;
 			using (@lock.ForWriting())
 			{
 				if (trackedComponentsDiagnostic != null)
@@ -106,11 +106,14 @@ namespace Castle.MicroKernel.Releasers
 					trackedComponentsDiagnostic.TrackedInstancesRequested -= trackedComponentsDiagnostic_TrackedInstancesRequested;
 					trackedComponentsDiagnostic = null;
 				}
-				burdens = instance2Burden.ToArray();
+				burdens = instance2Burden.ToList();
 				instance2Burden.Clear();
 			}
-			// NOTE: This is relying on a undocumented behavior that order of items when enumerating Dictionary<> will be oldest --> latest
-			foreach (var burden in burdens.Reverse())
+
+            // descending by creation time
+            burdens.Sort((a, b) => b.Key.CompareTo(a.Key));
+
+			foreach (var burden in burdens)
 			{
 				burden.Value.Released -= OnInstanceReleased;
 				perfCounter.DecrementTrackedInstancesCount();
@@ -133,7 +136,7 @@ namespace Castle.MicroKernel.Releasers
 
 			using (@lock.ForReading())
 			{
-				return instance2Burden.ContainsKey(instance);
+                return instance2Burden.ContainsKey(new InstanceEntry(instance));
 			}
 		}
 
@@ -148,8 +151,9 @@ namespace Castle.MicroKernel.Releasers
 			using (@lock.ForWriting())
 			{
 				// NOTE: we don't physically remove the instance from the instance2Burden collection here.
-				// we do it in OnInstanceReleased event handler
-				if (instance2Burden.TryGetValue(instance, out burden) == false)
+                // we do it in OnInstanceReleased event handler
+                var entry = new InstanceEntry(instance);
+				if (instance2Burden.TryGetValue(entry, out burden) == false)
 				{
 					return;
 				}
@@ -170,8 +174,9 @@ namespace Castle.MicroKernel.Releasers
 			try
 			{
 				using (@lock.ForWriting())
-				{
-					instance2Burden.Add(instance, burden);
+                {
+                    var timestamp = Interlocked.Increment(ref currentTimestamp);
+                    instance2Burden.Add(new InstanceEntry(timestamp, instance), burden);
 				}
 			}
 			catch (ArgumentNullException)
@@ -190,8 +195,9 @@ namespace Castle.MicroKernel.Releasers
 		private void OnInstanceReleased(Burden burden)
 		{
 			using (@lock.ForWriting())
-			{
-				if (instance2Burden.Remove(burden.Instance) == false)
+            {
+                var entry = new InstanceEntry(burden.Instance);
+				if (instance2Burden.Remove(entry) == false)
 				{
 					return;
 				}
@@ -240,5 +246,70 @@ namespace Castle.MicroKernel.Releasers
 			return perfMetricsFactory.CreateInstancesTrackedByReleasePolicyCounter(name);
 #endif
 		}
+
+        struct InstanceEntry : IEquatable<InstanceEntry>, IComparable<InstanceEntry>
+        {
+            public static readonly Int64 AnyTimestamp = 0;
+
+            public InstanceEntry(Object instance)
+            {
+                Timestamp = AnyTimestamp;
+                Instance = instance;
+            }
+
+            public InstanceEntry(Int64 timestamp, Object instance)
+            {
+                Timestamp = timestamp;
+                Instance = instance;
+            }
+
+            public readonly Int64 Timestamp;
+            public readonly Object Instance;
+
+            /// <summary>
+            /// Indicates whether the current object is equal to another object of the same type.
+            /// </summary>
+            /// <returns>
+            /// true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.
+            /// </returns>
+            /// <param name="other">An object to compare with this object.</param>
+            public Boolean Equals(InstanceEntry other)
+            {
+                return ReferenceEquals(Instance, other.Instance);
+            }
+
+            /// <summary>
+            /// Indicates whether this instance and a specified object are equal.
+            /// </summary>
+            /// <returns>
+            /// true if <paramref name="obj"/> and this instance are the same type and represent the same value; otherwise, false.
+            /// </returns>
+            /// <param name="obj">Another object to compare to. </param>
+            public override Boolean Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj))
+                {
+                    return false;
+                }
+
+                return obj is InstanceEntry && Equals((InstanceEntry)obj);
+            }
+
+            /// <summary>
+            /// Returns the hash code for this instance.
+            /// </summary>
+            /// <returns>
+            /// A 32-bit signed integer that is the hash code for this instance.
+            /// </returns>
+            public override Int32 GetHashCode()
+            {
+                return ReferenceEqualityComparer<Object>.Instance.GetHashCode(Instance);
+            }
+
+            public Int32 CompareTo(InstanceEntry other)
+            {
+                return Timestamp.CompareTo(other.Timestamp);
+            }
+        }
 	}
 }
