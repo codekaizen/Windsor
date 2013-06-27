@@ -148,7 +148,7 @@ namespace Castle.MicroKernel
 			Instance = instance;
 			if (decommission == Decommission.LateBound)
 			{
-				// TODO: this may need to be extended if we lazily provide any other decimmission concerns
+				// TODO: this may need to be extended if we lazily provide any other decommission concerns
 				RequiresDecommission = instance is IDisposable;
 			}
 		}

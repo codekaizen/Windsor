@@ -1501,6 +1501,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\buildscripts\CastleKey.snk">
+      <Link>CastleKey.snk</Link>
+    </None>
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>

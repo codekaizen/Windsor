@@ -26,7 +26,7 @@ namespace Castle.MicroKernel.Releasers
 	using Castle.Windsor.Diagnostics;
 
 	/// <summary>
-	///     Tracks all components requiring decomission (<see cref = "Burden.RequiresPolicyRelease" />)
+	///     Tracks all components requiring decommission (<see cref = "Burden.RequiresPolicyRelease" />)
 	/// </summary>
 	[Serializable]
 	public class LifecycledComponentsReleasePolicy : IReleasePolicy
@@ -87,7 +87,7 @@ namespace Castle.MicroKernel.Releasers
 					if (holder.LockAcquired == false)
 					{
 						// TODO: that's sad... perhaps we should have waited...? But what do we do now? We're in the debugger. If some thread is keeping the lock
-						// we could wait indefinatelly. I guess the best way to proceed is to add a 200ms timepout to accquire the lock, and if not succeeded
+						// we could wait indefinitely. I guess the best way to proceed is to add a 200ms timeout to acquire the lock, and if not succeeded
 						// assume that the other thread just waits and is not going anywhere and go ahead and read this anyway...
 					}
 					var array = instance2Burden.Values.ToArray();
